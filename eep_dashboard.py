@@ -6,6 +6,17 @@ import random
 # Set page configuration for better UI
 st.set_page_config(page_title="EEP Dashboard", layout="wide")
 
+# Custom CSS for responsiveness
+st.markdown(
+    """
+    <style>
+        .element-container { width: 100% !important; }
+        [data-testid="stElement"] iframe { width: 100% !important; height: 400px !important; }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Title of the dashboard
 st.title("Ehindero Empowerment Project 2025 (EEP) Dashboard")
 st.subheader("Tracking Initiatives Across Akoko North East & Akoko North West")
@@ -43,9 +54,9 @@ category_filter = st.sidebar.selectbox("Filter by Category", ["All"] + categorie
 if category_filter != "All":
     df = df[df["Category"] == category_filter]
 
-# Display Data Table
-st.subheader("Project Data Overview")
-st.write(df)
+# Display Data Table inside an expander for better mobile view
+with st.expander("📊 View Project Data Table"):
+    st.dataframe(df)
 
 # Budget Allocation by Ward (Bar Chart)
 st.subheader("Budget Allocation by Ward")
@@ -55,11 +66,12 @@ st.plotly_chart(fig_budget, use_container_width=True)
 # Project Distribution by Category (Pie Chart)
 st.subheader("Project Distribution by Category")
 fig_pie = px.pie(df, names="Category", title="Projects per Category")
-st.plotly_chart(fig_pie)
+st.plotly_chart(fig_pie, use_container_width=True)
 
 # Impact Analysis by Ward (Heatmap / Scatter Plot)
 st.subheader("Impact of Initiatives Across Wards")
 fig_heatmap = px.scatter(
     df, x="Ward", y="Impact (People)", size="Impact (People)", color="Category", title="People Impacted per Ward"
 )
+fig_heatmap.update_layout(autosize=True, margin=dict(l=0, r=0, t=50, b=50))
 st.plotly_chart(fig_heatmap, use_container_width=True)
